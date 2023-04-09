@@ -1,10 +1,3 @@
-## if 문 정리
-
-#### 2480번
-
-> 
-
-```python
 a,b,c = map(int, input().split())
 
 if a==b==c:
@@ -15,7 +8,5 @@ elif b==c:
     print(1000+b*100)
 elif a==c:
     print(1000+c*100)
-```
-
----
-
+else:
+    print(max(a,b,c)*100)
