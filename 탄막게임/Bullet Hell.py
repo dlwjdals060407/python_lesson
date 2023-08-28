@@ -2,7 +2,35 @@ import pygame
 import sys
 import random
 
-from Enemy import Enemy
+# 색상 정의
+white = (255, 255, 255)
+blue = (0, 0, 255)
+red = (255, 0, 0)
+
+class Enemy:
+    def __init__(self, x, y, screen):
+        self.width = 50
+        self.height = 50
+        self.x = x
+        self.y = y
+        self.speed = 3
+        self.screen = screen
+        self.active = True
+
+    def move(self):
+        if self.active:
+            self.y += self.speed
+            if self.y > self.screen.get_height():
+                self.active = False
+
+    def check_coliide(self, bullet):
+        bullet_rect = pygame.Rect(bullet[0], bullet[1], bullet_width, bullet_height)
+        enemy_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        return bullet_rect.colliderect(enemy_rect)
+
+    def draw(self):
+        if self.active:
+            pygame.draw.rect(self.screen, red, (self.x, self.y, self.width, self.height))
 
 # Pygame 초기화
 pygame.init()
@@ -12,11 +40,6 @@ screen_width = 600
 screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("탄막게임")
-
-# 색상 정의
-white = (255, 255, 255)
-blue = (0, 0, 255)
-red = (255, 0, 0)
 
 # 플레이어 초기 위치 및 속도
 player_width = 25
@@ -32,14 +55,9 @@ bullet_color = (255, 0, 0)
 bullet_speed = 10
 bullets = []
 
-# enemy_width = 25
-# enemy_height = 25
-# enemy_x = random.randint(0, screen_width - enemy_width)
-# enemy_y = 0
-# enemy_speed = 2
 # 메인 루프
 running = True
-enemyList = [Enemy(50, 0, screen),]
+enemyList = [Enemy(50, 0, screen)]
 
 while running:
     for event in pygame.event.get():
@@ -70,28 +88,22 @@ while running:
         bullet[1] -= bullet_speed
         if bullet[1] < 0:
             bullets.remove(bullet)
-
-    """ if bullet.colliderect(pygame.Rect(enemy_x, enemy_y, enemy_width, enemy_height)):
-        bullets.remove(bullet) """
-        
+    
     for bullet in bullets:
         pygame.draw.rect(screen, bullet_color, (bullet[0], bullet[1], bullet_width, bullet_height))
         for enemy in enemyList:
             if enemy.check_coliide(bullet):
                 bullets.remove(bullet)
-                Enemy.x = random.randint(0, screen_width - enemy.width)
-                Enemy.y = 0
+                enemy.x = random.randint(0, screen_width - enemy.width)
+                enemy.y = 0
 
     # 화면 업데이트
     screen.fill(white)
     pygame.draw.rect(screen, blue, (player_x, player_y, player_width, player_height))
-    # pygame.draw.rect(screen, red, (enemy_x, enemy_y, enemy_width, enemy_height))
 
-    #for enemy in enemyList:
-    Enemy.update()
-    Enemy.draw()
-
-                
+    for enemy in enemyList:
+        enemy.move()
+        enemy.draw()
 
     pygame.display.flip()
     # 초당 프레임 설정
