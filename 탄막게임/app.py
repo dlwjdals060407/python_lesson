@@ -6,29 +6,29 @@ import math
 from modules.Enemy import Enemy, EnemyBullet
 from modules.Bullet import Bullet
 from modules.Player import Player
-from modules.Boss import Boss
+from modules.Boss import Boss, BossPattern
 
 # 색상 정의
 white = (255, 255, 255)
 blue = (0, 0, 255)
 red = (255, 0, 0)
 
-# Pygame 초기화
+# Pygame 초기화 
 pygame.init()
 
 # 화면 크기 설정
 screen_width = 600
-screen_height = 800
+screen_height = 1000
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("탄막게임")
 
 player_bullet = []
 enemies = []
 enemy_bullet = []
-boss = []
-enemy = True
-
-boss_spawned = False
+boss_list =[]
+boss = None
+boss_active = False
+boss_pattern_active = False
 
 # 메인 루프
 running = True
@@ -37,13 +37,11 @@ enemy_bullet_timer = 0
 enemies_catch = 0
 boss_health = 20
 
-
 def move_bullets():
     for bullet in enemy_bullet:
         bullet.move()
         if bullet.is_offscreen():
-            enemy_bullet.remove(Bullet)
-
+            enemy_bullet.remove(bullet)
 
 def draw_bullets():
     for bullet in enemy_bullet:
@@ -62,17 +60,17 @@ while running:
 
     keys = pygame.key.get_pressed()
     player.move(keys)
-    if not boss_spawned:
+    if not boss_active:
         if random.randint(1, 100) == 90:
             x = random.randint(0, screen_width - 50)
             enemies.append(Enemy(x, 0, screen, screen_height))
     
-    if enemies_catch >= 1 and not boss_spawned:
-        x = random.randint(0, screen_width - 50)
-        boss.append(Boss(x, 0, screen, screen_height))
-        boss_spawned = True
+    if enemies_catch >= 1 and not boss_active:
+        x = random.randint(0, screen_width - 50) 
+        boss = Boss(x, 0, screen, screen_height) 
+        boss_list.append(boss)
+        boss_active = True
     
-
     for enemy in enemies:
         shoot_timer,shoot_interval,x,y,width,height = enemy.update(player.x, player.y)
         if shoot_timer >= shoot_interval:
@@ -116,13 +114,13 @@ while running:
                 player_bullet.remove(bullet)
                 enemies_catch +=1
     
-    for b in boss: # 보스가 플레이어의 총알에 닿았을 때
+    for b in boss_list: # 보스가 플레이어의 총알에 닿았을 때
         for bullet in player_bullet:
             if b.check_collision(bullet):
                 player_bullet.remove(bullet)
                 boss_health -= 1
-                if boss_health == 0:
-                    boss.remove(b)
+                if boss_health <= 0:
+                    boss_list.remove(b)
 
     for enemy in enemies: # 적과 플레이어가 닿았을 때
         if enemy.active:
@@ -154,17 +152,27 @@ while running:
         enemy.move()
         enemy.draw()
 
-    if boss_spawned:
-        for b in boss:
+    if boss_active:
+        for b in boss_list:
             b.move()
             b.draw()
+            b.draw_pattern()
+
             if b.health == 0:
-                boss.remove(b)
-                boss_spawned = False
-        
+                boss_list.remove(b)
+                boss_active = False
+
+            if boss.health > 0:
+                boss.activate_pattern()
+
+            if b.activate_pattern:
+                for bo in boss_list:
+                    b.pattern.excute_pattern(player.x, player.y)
+                    b.move_bullets()
+
     move_bullets()
     draw_bullets()
-
+    
     font = pygame.font.Font(None, 30)
     health_text = font.render(f'Health: {player.health}', True, red)
     screen.blit(health_text, (10, 700))

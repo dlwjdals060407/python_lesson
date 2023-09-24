@@ -14,7 +14,7 @@ class Enemy:
         self.screen = screen
         self.active = True
         self.shoot_timer = 0
-        self.shoot_interval = 50
+        self.shoot_interval = 100
         self.screen_height = screen_height
         self.min_y = 100
         self.max_y = 300
@@ -72,5 +72,9 @@ class EnemyBullet:
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+
+    def update(self):
+        self.x += self.speed * math.cos(self.angle)
+        self.y += self.speed * math.sin(self.angle)
 
         
