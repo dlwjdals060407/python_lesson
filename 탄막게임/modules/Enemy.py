@@ -14,7 +14,7 @@ class Enemy:
         self.screen = screen
         self.active = True
         self.shoot_timer = 0
-        self.shoot_interval = 100
+        self.shoot_interval = random.randint(100, 300)  # 랜덤한 발사 간격 설정
         self.screen_height = screen_height
         self.min_y = 100
         self.max_y = 300
@@ -76,5 +76,3 @@ class EnemyBullet:
     def update(self):
         self.x += self.speed * math.cos(self.angle)
         self.y += self.speed * math.sin(self.angle)
-
-        
