@@ -1,7 +1,9 @@
 import pygame
+import math
+from Bullet import Bullet
 
 class Character:
-    def __init__(self, X, Y, xspeed, yspeed, rad, spawn_frame=0) -> None:
+    def __init__(self, X, Y, xspeed, yspeed, rad, is_boss = False, spawn_frame=0) -> None:
         self.posX = X
         self.posY = Y
         self.xspeed = xspeed
@@ -25,3 +27,11 @@ class Character:
         if keys[pygame.K_DOWN]:
             self.yspeed = 3  # 아래로 이동
     
+    def is_colliding_with_player(self, player):
+        distance = math.sqrt((self.posX - player.posX)**2 + (self.posY - player.posY)**2)
+        return distance < self.rad + player.rad
+
+class Boss(Character):
+    def __init__(self, X, Y, xspeed, yspeed, rad) -> None:
+        super().__init__(X, Y, xspeed, yspeed, rad)
+
