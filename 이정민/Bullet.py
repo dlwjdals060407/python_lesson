@@ -19,3 +19,8 @@ class Bullet:
     def is_colliding_with_enemy(self, enemy):
         distance = math.sqrt((self.posX - enemy.posX)**2 + (self.posY - enemy.posY)**2)
         return distance < self.rad + enemy.rad
+    
+    def is_colliding_with_boss(self, boss):
+        distance = math.sqrt((self.posX - boss.posX) ** 2 + (self.posY - boss.posY) ** 2)
+        return distance < self.rad + boss.rad
+    

@@ -4,6 +4,7 @@ import random
 import math
 from Bullet import Bullet
 from Character import Character,Boss
+from Laser import Laser
 
 # 색상 정의
 white = (255, 255, 255)
@@ -41,15 +42,18 @@ pygame.display.set_caption("탄막게임")
 
 enemys = []
 bullets = []
+lasers = []
 
 player = Character(screen_width//2, screen_height - 30, 0, 0, 20)
 player_bullets = []
-
 player_health = 500
 
 boss = None
-boss_pattern_timer = 0
-boss_pattern_interval = 60 
+boss_pattern_timer_1 = 0
+boss_pattern_interval_1 = 20
+boss_pattern_timer_2 = 0
+boss_pattern_interval_2 = 600
+boss_health = 5 
 
 frame_tick = 0
 
@@ -57,6 +61,8 @@ enemy_catch = 0
 
 pygame.font.init()
 font = pygame.font.Font(None, 36)
+
+rotate_angle = 0
 
 # 메인 루프
 running = True
@@ -114,7 +120,7 @@ while running:
             
             if player_health <= 0:
                 running = False
-                
+
     for bullet in player_bullets:
         bullet.update()
         pygame.draw.circle(screen, (0,0,255), (bullet.posX, bullet.posY), bullet.rad)
@@ -125,30 +131,65 @@ while running:
                 enemys.remove(enemy)
                 enemy_catch += 1
 
+        if boss is not None and bullet.is_colliding_with_boss(boss):
+            player_bullets.remove(bullet)
+            boss_health -= 1
+
+            if boss_health <= 0:
+                boss = None
+
     if enemy_catch >= 2:
         if boss is None:
-            boss = Boss(screen_width // 2, 100, 0, 0.1, 40)
+            boss = Boss(screen_width // 2, 100, 3, 0.1, 40, screen_width)
+            enemy_catch = 0
 
     if boss is not None:
         boss.update()
         pygame.draw.circle(screen, (0, 0, 0), (boss.posX, boss.posY), boss.rad)
-        
+        rotate_angle += 6
         # 패턴 로직
-        if boss_pattern_timer <= 0:
+        if boss_pattern_timer_1 <= 0:
         # 보스 패턴 실행
-            angles = []
             bullet_speed = 3  # 총알 속도
-            for angle_degrees in range(0, 360, 12):
+            for angle_degrees in range(rotate_angle, rotate_angle + 360, 12):
                 angle = math.radians(angle_degrees)  # 각도를 라디안으로 변환
                 bullet = Bullet(boss.posX, boss.posY, bullet_speed * math.cos(angle), bullet_speed * math.sin(angle), 5)
                 bullets.append(bullet)
 
-            boss_pattern_timer = boss_pattern_interval  # 패턴 실행 간격 초기화
+            boss_pattern_timer_1 = boss_pattern_interval_1
         else:
-            boss_pattern_timer -= 1
-
-        if boss_pattern_timer == boss_pattern_interval:
+            boss_pattern_timer_1 -= 1
             enemys = []
+
+        # 패턴 2 실행 부분 (보스 체력이 일정 수준 아래로 떨어졌을 때)
+        if boss_pattern_timer_2 <= 0:
+            laser_speed = 5  # 레이저 속도
+            laser_width = 10  # 레이저 너비
+            laser_height = 100  # 레이저 높이
+            for i in range(6):  # 6방향으로 레이저 발사 (60도 간격)
+                angle_degrees = i * 60  # 각 레이저의 방향 (60도 간격)
+                angle_radians = math.radians(angle_degrees)
+                laser_xspeed = laser_speed * math.cos(angle_radians)
+                laser_yspeed = laser_speed * math.sin(angle_radians)
+                laser = Laser(boss.posX // 2 - laser_width // 2, boss.posY , laser_width, laser_height, laser_xspeed, laser_yspeed, lifespan=100)
+                lasers.append(laser)
+
+            boss_pattern_timer_2 = boss_pattern_interval_2
+        else:
+            boss_pattern_timer_2 -= 1
+
+    for laser in lasers:
+        laser.update()
+        pygame.draw()
+
+    bullets_to_remove = []
+    for bullet in bullets:
+        if (bullet.posX < 0 or bullet.posX > screen_width or
+            bullet.posY < 0 or bullet.posY > screen_height):
+            bullets_to_remove.append(bullet)
+
+    for bullet in bullets_to_remove:
+        bullets.remove(bullet)
 
     player.update()
     pygame.draw.circle(screen, (255,0,0), (player.posX, player.posY), player.rad)
