@@ -52,12 +52,14 @@ boss = None
 boss_pattern_timer_1 = 0
 boss_pattern_interval_1 = 20
 boss_pattern_timer_2 = 0
-boss_pattern_interval_2 = 600
+boss_pattern_interval_2 = 30
 boss_health = 5 
 
 frame_tick = 0
 
 enemy_catch = 0
+
+flikering_cnt = 15
 
 pygame.font.init()
 font = pygame.font.Font(None, 36)
@@ -131,6 +133,20 @@ while running:
                 enemys.remove(enemy)
                 enemy_catch += 1
 
+    lasers_to_remove = []
+    for l in lasers:
+        laser.update()
+        laser.width -= 1    
+        pygame.draw.rect(screen, (120, 120, 120), (laser.posX, laser.posY, laser.width, laser.height))
+        if laser.is_colliding_with_player(player):
+            player_health -= 1
+            lasers_to_remove.append(laser)
+        if laser.duration < 0:
+            lasers_to_remove.append(laser)
+    
+    for laser in lasers_to_remove:
+        lasers.remove(laser)
+
         if boss is not None and bullet.is_colliding_with_boss(boss):
             player_bullets.remove(bullet)
             boss_health -= 1
@@ -163,24 +179,13 @@ while running:
 
         # 패턴 2 실행 부분 (보스 체력이 일정 수준 아래로 떨어졌을 때)
         if boss_pattern_timer_2 <= 0:
-            laser_speed = 5  # 레이저 속도
-            laser_width = 10  # 레이저 너비
-            laser_height = 100  # 레이저 높이
-            for i in range(6):  # 6방향으로 레이저 발사 (60도 간격)
-                angle_degrees = i * 60  # 각 레이저의 방향 (60도 간격)
-                angle_radians = math.radians(angle_degrees)
-                laser_xspeed = laser_speed * math.cos(angle_radians)
-                laser_yspeed = laser_speed * math.sin(angle_radians)
-                laser = Laser(boss.posX // 2 - laser_width // 2, boss.posY , laser_width, laser_height, laser_xspeed, laser_yspeed, lifespan=100)
-                lasers.append(laser)
+            
+            laser = Laser(boss.posX, boss.posY, 40, 2000, 60)
+            lasers.append(laser)
 
             boss_pattern_timer_2 = boss_pattern_interval_2
         else:
             boss_pattern_timer_2 -= 1
-
-    for laser in lasers:
-        laser.update()
-        pygame.draw()
 
     bullets_to_remove = []
     for bullet in bullets:

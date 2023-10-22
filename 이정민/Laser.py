@@ -1,16 +1,16 @@
 import math
 
 class Laser:
-    def __init__(self, X, Y, width, height, xspeed, yspeed, lifespan):
+    def __init__(self, X, Y, width, height, duration):
         self.posX = X
         self.posY = Y
         self.width = width
         self.height = height
-        self.xspeed = xspeed
-        self.yspeed = yspeed
-        self.lifespan = lifespan  # 레이저 수명
+        self.duration = duration
 
     def update(self):
-        self.posX += self.xspeed
-        self.posY += self.yspeed
-        self.lifespan -= 1  # 수명 감소
+        self.duration -= 1
+
+    def is_colliding_with_player(self, player):
+        distance = math.sqrt((self.posX - player.posX)**2 + (self.posY - player.posY)**2)
+        return distance < player.rad
