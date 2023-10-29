@@ -4,7 +4,6 @@ import random
 import math
 from Bullet import Bullet
 from Character import Character,Boss
-from Laser import Laser
 
 # 색상 정의
 white = (255, 255, 255)
@@ -12,17 +11,17 @@ blue = (0, 0, 255)
 red = (255, 0, 0)
 
 def spawn():
-    std = random.randint(0, 10000)
+    std = random.randint(0, 5000)
     if std < 5:
         # 네임드 스폰
         pass
-    if std < 50:
+    if std < 500:
         # 잡몹 스폰
         return 1
     return 0
 
 def random_shoot():
-    std = random.randint(0, 10000)
+    std = random.randint(0, 5000)
     if std < 5:
         # 네임드 스폰
         pass
@@ -42,17 +41,19 @@ pygame.display.set_caption("탄막게임")
 
 enemys = []
 bullets = []
-lasers = []
 
 player = Character(screen_width//2, screen_height - 30, 0, 0, 20)
 player_bullets = []
-player_health = 500
+player_health = 50
 
 boss = None
 boss_pattern_timer_1 = 0
 boss_pattern_interval_1 = 20
 boss_pattern_timer_2 = 0
 boss_pattern_interval_2 = 30
+boss_pattern_timer_3 = 0
+boss_pattern_interval_3 = 120
+boss_pattern3_bullet = []
 boss_health = 5 
 
 frame_tick = 0
@@ -60,6 +61,8 @@ frame_tick = 0
 enemy_catch = 0
 
 flikering_cnt = 15
+
+enemy_spawn = True
 
 pygame.font.init()
 font = pygame.font.Font(None, 36)
@@ -96,21 +99,22 @@ while running:
     # if frame_tick == 60:
     #     enemys.append(Character(random.randint(0, screen_width), 0, 0, 1, 10))
     
-    for enemy in enemys:
-        enemy.update()
-        pygame.draw.circle(screen, (0,255,0), (enemy.posX, enemy.posY), enemy.rad)
-        if random_shoot() == 1:
-            # 유도탄 발사
-            bullets.append(Bullet(enemy.posX, enemy.posY, (player.posX - enemy.posX) // 100, (player.posY - enemy.posY) // 100, 5))
-            print("bullet spawned")
-            
-            for enemy in enemys:
-                if enemy.is_colliding_with_player(player):
-                    player_health -= 1
-                    enemys.remove(enemy)
+    if enemy_spawn == True:
+        for enemy in enemys:
+            enemy.update()
+            pygame.draw.circle(screen, (0,255,0), (enemy.posX, enemy.posY), enemy.rad)
+            if random_shoot() == 1:
+                # 유도탄 발사
+                bullets.append(Bullet(enemy.posX, enemy.posY, (player.posX - enemy.posX) // 100, (player.posY - enemy.posY) // 100, 5))
+                print("bullet spawned")
+                
+                for enemy in enemys:
+                    if enemy.is_colliding_with_player(player):
+                        player_health -= 1
+                        enemys.remove(enemy)
 
-                    if player_health <= 0:
-                        running = False
+                        if player_health <= 0:
+                            running = False
 
     for bullet in bullets:
         bullet.update()
@@ -127,25 +131,12 @@ while running:
         bullet.update()
         pygame.draw.circle(screen, (0,0,255), (bullet.posX, bullet.posY), bullet.rad)
         
-        for enemy in enemys:
-            if bullet.is_colliding_with_enemy(enemy):#적이 플레이어 총알에 맞았을 때
-                player_bullets.remove(bullet)
-                enemys.remove(enemy)
-                enemy_catch += 1
-
-    lasers_to_remove = []
-    for l in lasers:
-        laser.update()
-        laser.width -= 1    
-        pygame.draw.rect(screen, (120, 120, 120), (laser.posX, laser.posY, laser.width, laser.height))
-        if laser.is_colliding_with_player(player):
-            player_health -= 1
-            lasers_to_remove.append(laser)
-        if laser.duration < 0:
-            lasers_to_remove.append(laser)
-    
-    for laser in lasers_to_remove:
-        lasers.remove(laser)
+        if enemy_spawn == True:
+            for enemy in enemys:
+                if bullet.is_colliding_with_enemy(enemy):#적이 플레이어 총알에 맞았을 때
+                    player_bullets.remove(bullet)
+                    enemys.remove(enemy)
+                    enemy_catch += 1
 
         if boss is not None and bullet.is_colliding_with_boss(boss):
             player_bullets.remove(bullet)
@@ -153,39 +144,77 @@ while running:
 
             if boss_health <= 0:
                 boss = None
+                enemy_spawn = True
 
     if enemy_catch >= 2:
         if boss is None:
-            boss = Boss(screen_width // 2, 100, 3, 0.1, 40, screen_width)
+            boss = Boss(screen_width // 2, 100, 3, 0, 40, screen_width)
             enemy_catch = 0
+            enemy_spawn = False
 
     if boss is not None:
         boss.update()
         pygame.draw.circle(screen, (0, 0, 0), (boss.posX, boss.posY), boss.rad)
         rotate_angle += 6
         # 패턴 로직
-        if boss_pattern_timer_1 <= 0:
+        if boss_health >= 4:
+            if boss_pattern_timer_1 <= 0:
         # 보스 패턴 실행
-            bullet_speed = 3  # 총알 속도
-            for angle_degrees in range(rotate_angle, rotate_angle + 360, 12):
-                angle = math.radians(angle_degrees)  # 각도를 라디안으로 변환
-                bullet = Bullet(boss.posX, boss.posY, bullet_speed * math.cos(angle), bullet_speed * math.sin(angle), 5)
-                bullets.append(bullet)
+                bullet_speed = 3  # 총알 속도
+                for angle_degrees in range(rotate_angle, rotate_angle + 360, 12):
+                    angle = math.radians(angle_degrees)  # 각도를 라디안으로 변환
+                    bullet = Bullet(boss.posX, boss.posY, bullet_speed * math.cos(angle), bullet_speed * math.sin(angle), 5)
+                    bullets.append(bullet)
 
-            boss_pattern_timer_1 = boss_pattern_interval_1
-        else:
-            boss_pattern_timer_1 -= 1
-            enemys = []
+                boss_pattern_timer_1 = boss_pattern_interval_1
+            else:
+                boss_pattern_timer_1 -= 1
+                enemys = []
 
         # 패턴 2 실행 부분 (보스 체력이 일정 수준 아래로 떨어졌을 때)
-        if boss_pattern_timer_2 <= 0:
-            
-            laser = Laser(boss.posX, boss.posY, 40, 2000, 60)
-            lasers.append(laser)
+        if boss_health ==3:
+            if boss_pattern_timer_2 <= 0:
+                num_bullets = 8  # 생성할 총알 수 조절
+                for _ in range(num_bullets):
+                    # 무작위 방향 생성 (화면 테두리에서 시작)
+                    side = random.choice(["top", "bottom", "left", "right"])
+                    if side == "top":
+                        posX = random.uniform(0, screen_width)
+                        posY = 0
+                    elif side == "bottom":
+                        posX = random.uniform(0, screen_width)
+                        posY = screen_height
+                    elif side == "left":
+                        posX = 0
+                        posY = random.uniform(0, screen_height)
+                    else:
+                        posX = screen_width
+                        posY = random.uniform(0, screen_height)
 
-            boss_pattern_timer_2 = boss_pattern_interval_2
-        else:
-            boss_pattern_timer_2 -= 1
+                    # 방향 벡터 계산
+                    direction = math.atan2(player.posY - posY, player.posX - posX)
+                    bullet_speed = 3  # 총알 속도
+
+                    # 총알 생성
+                    bullet = Bullet(posX, posY, bullet_speed * math.cos(direction), bullet_speed * math.sin(direction), 6)
+                    bullets.append(bullet)
+    
+            if boss_pattern_timer_2 <= 0:            
+                boss_pattern_timer_2 = boss_pattern_interval_2
+            else:
+                boss_pattern_timer_2 -= 1
+
+        #패턴 3
+        if boss_health == 1:
+            if boss_pattern_timer_3 <= 0:
+                directions = [0,90,180,270]
+                for d in directions:
+                    bullet = Bullet(player.posX, player.posY, bullet_speed * math.cos(math.radians(direction)), bullet_speed * math.sin(math.radians(direction)), 5)
+                    bullets.append(bullet)
+        
+                boss_pattern_timer_3 = boss_pattern_interval_3
+            else:
+                boss_pattern_timer_3 -= 1
 
     bullets_to_remove = []
     for bullet in bullets:
