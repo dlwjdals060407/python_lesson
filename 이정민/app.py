@@ -52,8 +52,12 @@ boss_pattern_interval_1 = 20
 boss_pattern_timer_2 = 0
 boss_pattern_interval_2 = 30
 boss_pattern_timer_3 = 0
-boss_pattern_interval_3 = 120
+boss_pattern_interval_3 = 150
+boss_pattern3_main_bullet = []
 boss_pattern3_bullet = []
+boss_pattern3_attack_timer = 0
+boss_pattern_timer_4 = 0
+boss_pattern_interval_4 = 20
 boss_health = 5 
 
 frame_tick = 0
@@ -134,9 +138,15 @@ while running:
         if enemy_spawn == True:
             for enemy in enemys:
                 if bullet.is_colliding_with_enemy(enemy):#적이 플레이어 총알에 맞았을 때
-                    player_bullets.remove(bullet)
-                    enemys.remove(enemy)
-                    enemy_catch += 1
+                    if bullet in player_bullets:
+                        player_bullets.remove(bullet)
+                    else:
+                        pass
+                    if enemy in enemys:
+                        enemys.remove(enemy)
+                        enemy_catch += 1
+                    else:
+                        pass
 
         if boss is not None and bullet.is_colliding_with_boss(boss):
             player_bullets.remove(bullet)
@@ -157,7 +167,7 @@ while running:
         pygame.draw.circle(screen, (0, 0, 0), (boss.posX, boss.posY), boss.rad)
         rotate_angle += 6
         # 패턴 로직
-        if boss_health >= 4:
+        if boss_health >= 4 :
             if boss_pattern_timer_1 <= 0:
         # 보스 패턴 실행
                 bullet_speed = 3  # 총알 속도
@@ -205,16 +215,40 @@ while running:
                 boss_pattern_timer_2 -= 1
 
         #패턴 3
-        if boss_health == 1:
+        if boss_health == 2:
+            print(boss_pattern3_attack_timer)
             if boss_pattern_timer_3 <= 0:
-                directions = [0,90,180,270]
-                for d in directions:
-                    bullet = Bullet(player.posX, player.posY, bullet_speed * math.cos(math.radians(direction)), bullet_speed * math.sin(math.radians(direction)), 5)
+                angles = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
+                print("큰거나옴")
+                boss_pattern3_attack_timer =0
+                for angle in angles:
+                    radian_angle = math.radians(angle)
+                    bullet_x = boss.posX + 70 * math.cos(radian_angle)
+                    bullet_y = boss.posY + 70 * math.sin(radian_angle)
+                    bullet = Bullet(bullet_x, bullet_y, (bullet_speed * math.cos(radian_angle))*3, (bullet_speed * math.sin(radian_angle))*3, 20)
                     bullets.append(bullet)
-        
+                    boss_pattern3_main_bullet.append(bullet)
+
                 boss_pattern_timer_3 = boss_pattern_interval_3
             else:
                 boss_pattern_timer_3 -= 1
+                boss_pattern3_attack_timer += 1
+            if boss_pattern3_attack_timer == 30:
+                for main_bullet in boss_pattern3_main_bullet:
+                    for angle in [0, 45, 90, 135, 180, 225, 270, 315]:
+                        bullet_direction = math.radians(angle)
+                        new_bullet = Bullet(main_bullet.posX, main_bullet.posY,bullet_speed * math.cos(bullet_direction), bullet_speed * math.sin(bullet_direction),5)
+                        bullets.append(new_bullet)
+
+        """ #패턴 4
+        bullets.remove(new_bullet)
+        if boss_health == 1:
+            if boss_pattern_timer_4 <= 0:
+                angle = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
+                boss_pattern_timer_4 = boss_pattern_interval_4
+            else:
+                boss_pattern_timer_4 -= 1 """
+
 
     bullets_to_remove = []
     for bullet in bullets:
