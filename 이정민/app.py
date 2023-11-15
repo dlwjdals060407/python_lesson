@@ -59,6 +59,7 @@ boss_pattern3_attack_timer = 0
 boss_pattern_timer_4 = 0
 boss_pattern_interval_4 = 20
 boss_health = 5 
+time_tick = 0
 
 frame_tick = 0
 
@@ -126,6 +127,8 @@ while running:
         
         if bullet.is_colliding_with_player(player):#플레이어가 적 총알에 맞았을 때
             bullets.remove(bullet)
+            if bullet.rad == 20:
+                boss_pattern3_main_bullet.remove(bullet)
             player_health -= 1
             
             if player_health <= 0:
@@ -228,6 +231,9 @@ while running:
                     bullet = Bullet(bullet_x, bullet_y, (bullet_speed * math.cos(radian_angle))*3, (bullet_speed * math.sin(radian_angle))*3, 20)
                     bullets.append(bullet)
                     boss_pattern3_main_bullet.append(bullet)
+                # if bullet.is_colliding_with_player(player):
+                #     boss_pattern3_main_bullet.remove(bullet)
+                #     player_health -= 1
 
                 boss_pattern_timer_3 = boss_pattern_interval_3
             else:
@@ -240,16 +246,13 @@ while running:
                         new_bullet = Bullet(main_bullet.posX, main_bullet.posY,bullet_speed * math.cos(bullet_direction), bullet_speed * math.sin(bullet_direction),5)
                         bullets.append(new_bullet)
 
-        """ #패턴 4
-        bullets.remove(new_bullet)
+        #패턴 4
         if boss_health == 1:
             if boss_pattern_timer_4 <= 0:
-                angle = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
+                time_tick = 0
+
                 boss_pattern_timer_4 = boss_pattern_interval_4
-            else:
-                boss_pattern_timer_4 -= 1 """
-
-
+                        
     bullets_to_remove = []
     for bullet in bullets:
         if (bullet.posX < 0 or bullet.posX > screen_width or
