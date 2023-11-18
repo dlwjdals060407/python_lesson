@@ -23,8 +23,14 @@ class Bullet:
             self.move_pattern3(player)
         if self.attr == 4:
             bulletList = self.move_pattern4(bulletList)
+        if self.attr == 5:
+            bulletList = self.move_pattern5(bulletList)
         return bulletList
     
+    def is_colliding_with_player(self, player):
+        distance = math.sqrt((self.x - player.x)**2 + (self.y - player.y)**2)
+        return distance < self.rad + player.rad
+
     # 직선
     def move_default_pattern(self, x=0, y=0):
         self.x += self.xspeed
@@ -68,14 +74,32 @@ class Bullet:
         self.x += self.xspeed
         self.y += self.yspeed
         
-    def move_pattern4(self,bulletList):
-        
+    def move_pattern4(self, bulletList):
         self.timeTick += 1
-        angle_increase = 5
-        num_bullets = 36
-        if self.timeTick >= 90:
-            for i in range(num_bullets):
-                angle = math.radians(i * angle_increase)
-                bulletList.append(Bullet(self.x, self.y, math.cos(angle) * 3, math.sin(angle) * 3, 6, attr=4))
-        return bulletList
+        self.x += self.xspeed
+        self.y += self.yspeed
         
+        newList = bulletList
+        if self.timeTick >= 80:
+            angles = [0, 30, 60, 90, 120, 150, 180]
+            for angle in angles:
+                    seta = math.radians(angle)
+                    bullet = Bullet(self.x, self.y, math.cos(seta)*3, math.sin(seta)*3, 6, attr=0)
+                    newList.append(bullet)
+            bulletList.remove(self) 
+        return newList
+
+    def move_pattern5(self, bulletList):
+        self.timeTick += 1
+        self.x += self.xspeed
+        self.y += self.yspeed
+        
+        newList = bulletList
+        if self.timeTick >= 90:
+            angles = [0, 30, 60, 90, 120, 150, 180]
+            for angle in angles:
+                    seta = math.radians(angle)
+                    bullet = Bullet(self.x, self.y, math.cos(seta)*2, math.sin(seta)*2, 6, attr=0)
+                    newList.append(bullet)
+            bulletList.remove(self) 
+        return newList

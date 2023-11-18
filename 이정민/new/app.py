@@ -91,11 +91,55 @@ while running:
                     angle = math.radians(angles)
                     enemyBullets.append(Bullet(e.x, e.y, math.cos(angle)*3, math.sin(angle)*3, 4))
     if frameCnt == 560:
-        enemys.append(Enemy(screen_width//2, 0, 0, 2, 20, attr=0))
-    if frameCnt == 570:
+        enemys.append(Enemy(random.randint(0, screen_width), 0, 0, 2, 20, attr=3))
+    if frameCnt >= 600 and frameCnt % 60 == 0:
         for e in enemys:
-            if e.attr == 0:
-                enemyBullets = e.pattern3(enemyBullets)                
+            if e.attr == 3:
+                for angles in range(0, 360, 10):
+                    angle = math.radians(angles)
+                    enemyBullets.append(Bullet(e.x, e.y, math.cos(angle) * 3, math.sin(angle) * 3, 4))
+    if frameCnt == 620:
+        enemys.append(Enemy(random.randint(0, screen_width), 0, 0, 2, 20, attr=4))
+    if frameCnt >= 680 and frameCnt % 68 == 0:
+        for e in enemys:
+            if e.attr == 4:
+                for angles in range(0, 360, 10):
+                    angle = math.radians(angles)
+                    enemyBullets.append(Bullet(e.x, e.y, math.cos(angle) * 3, math.sin(angle) * 3, 4))
+    if frameCnt == 720:
+        enemys.append(Enemy(random.randint(0, screen_width), 0, 0, 2, 20, attr=5))
+    if frameCnt >= 720 and frameCnt % 72 == 0:
+        for e in enemys:
+            if e.attr == 5:
+                for angles in range(0, 360, 10):
+                    angle = math.radians(angles)
+                    enemyBullets.append(Bullet(e.x, e.y, math.cos(angle) * 3, math.sin(angle) * 3, 4))
+    if frameCnt == 800:
+        enemys.append(Enemy(100, 0, 0, 2, 20, attr=6))
+        enemys.append(Enemy(500, 0, 0, 2, 20, attr=6))
+    if frameCnt >= 820 and frameCnt % 82 == 0:
+        for e in enemys:
+            if e.attr == 6:
+                enemyBullets = e.pattern4(enemyBullets)
+    if frameCnt >= 870 and frameCnt % 87 == 0:
+        for e in enemys:
+            if e.attr == 6:
+                enemyBullets = e.pattern5(enemyBullets)
+
+    # if frameCnt == 850:
+    #     for e in enemys:
+    #         if e.attr == 6:
+    #             enemyBullets = e.pattern4(enemyBullets)
+    
+    # if frameCnt == 600:
+    #     enemys.append(Enemy(0, 50, 8, 2, 20, attr=1))
+    # if frameCnt == 660: #적 궤적에 따라 총알이 생성되도록 하는 패턴
+    #     for e in enemys:
+    #         if e.attr == 1:
+    #             for i in range(10):
+    #                 for position in e.path:
+    #                     x, y = position
+    #                     enemyBullets.append(Bullet(x,y,0,5,4)) 
     
     # enemy update
     for e in enemys:
@@ -107,6 +151,8 @@ while running:
     
     # delete enemy
     for e in enemys:
+        if e.is_colliding_with_player(player):
+            enemys.remove(e)
         if e.x < 0 or e.x > screen_width:
             enemys.remove(e)
             continue
@@ -116,6 +162,8 @@ while running:
     
     # enemy bullet update
     for b in enemyBullets:
+        if b.is_colliding_with_player(player):
+            pass
         enemyBullets = b.update(enemyBullets, player)
     
     # draw enemy bullet
@@ -131,6 +179,9 @@ while running:
             enemyBullets.remove(b)
             continue
     
+    bullets_to_remove = []
+
+
     # player move
     keys = pygame.key.get_pressed()
     player.move(keys)
