@@ -25,6 +25,8 @@ class Bullet:
             bulletList = self.move_pattern4(bulletList)
         if self.attr == 5:
             bulletList = self.move_pattern5(bulletList)
+        if self.attr == 6:
+            self.boss_move_pattern1(player)
         return bulletList
     
     def is_colliding_with_player(self, player):
@@ -103,3 +105,12 @@ class Bullet:
                     newList.append(bullet)
             bulletList.remove(self) 
         return newList
+    
+    def boss_move_pattern1(self, player):
+        self.timeTick += 1
+        if self.timeTick == 100:
+            self.xspeed = (player.x-self.x)//50
+            self.yspeed = (player.y-self.y)//50
+        
+        self.x += self.xspeed
+        self.y += self.yspeed
