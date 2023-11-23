@@ -33,6 +33,10 @@ class Enemy:
             self.boss_move_pattern1()
         if self.attr == 8:
             self.stop()
+        if self.attr == 9:
+            self.boss_pattern_2()
+        if self.attr == 10:
+            self.boss_pattern_3()
 
     def is_colliding_with_player(self, player):
         distance = math.sqrt((self.x - player.x)**2 + (self.x - player.y)**2)
@@ -163,3 +167,28 @@ class Enemy:
                 new.append(Bullet(self.x, self.y, math.cos(seta) * 2, math.sin(seta) * 2, 7, attr=6))
         return bulletList
     
+    def boss_pattern_2(self):
+        self.timetick +=1 
+        if self.timetick <= 200:
+            self.xspeed = 1
+            self.yspeed = 0
+            self.x += self.xspeed
+            self.y += self.yspeed
+        else:
+            self.xspeed = 0
+            self.yspeed = 2
+            self.x += self.xspeed
+            self.y += self.yspeed
+    
+    def boss_pattern_3(self):
+        self.timetick +=1 
+        if self.timetick <= 200:
+            self.xspeed = -1
+            self.yspeed = 0
+            self.x += self.xspeed
+            self.y += self.yspeed
+        else:
+            self.xspeed = 0
+            self.yspeed = 2
+            self.x += self.xspeed
+            self.y += self.yspeed

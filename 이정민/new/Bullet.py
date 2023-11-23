@@ -27,6 +27,10 @@ class Bullet:
             bulletList = self.move_pattern5(bulletList)
         if self.attr == 6:
             self.boss_move_pattern1(player)
+        if self.attr == 7:
+             self.boss_move_pattern2()
+        if self.attr == 8:
+             self.boss_move_pattern2()
         return bulletList
     
     def is_colliding_with_player(self, player):
@@ -108,9 +112,26 @@ class Bullet:
     
     def boss_move_pattern1(self, player):
         self.timeTick += 1
-        if self.timeTick == 100:
-            self.xspeed = (player.x-self.x)//50
-            self.yspeed = (player.y-self.y)//50
+        if self.timeTick == 80:
+            self.xspeed = (player.x-self.x)//25
+            self.yspeed = (player.y-self.y)//25
         
         self.x += self.xspeed
         self.y += self.yspeed
+
+    def boss_move_pattern2(self, bulletList):
+        self.timeTick += 1
+        self.x += self.xspeed
+        self.y += self.yspeed
+        
+        newList = bulletList
+        if self.timeTick >= 90:
+            angles = [0, 30, 60, 90, 120, 150, 180]
+            for angle in angles:
+                    seta = math.radians(angle)
+                    bullet = Bullet(self.x, self.y, math.cos(seta)*100, math.sin(seta)*100, 6, attr=8)
+                    newList.append(bullet)
+            bulletList.remove(self) 
+        return newList
+    def boss_move_pattern3(self):
+        pass
