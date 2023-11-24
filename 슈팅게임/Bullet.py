@@ -13,6 +13,10 @@ class Bullet:
         self.angle = 0
         
     def update(self, bulletList, player):
+        self.x = min(self.x, 600)
+        self.y = min(self.y, 1000)
+        self.x = max(self.x, 0)
+        self.y = max(self.y, 0)
         if self.attr == 0:
             self.move_default_pattern()
         if self.attr == 1:

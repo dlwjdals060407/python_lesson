@@ -20,6 +20,7 @@ rotate_angle = 0
 frameCnt = 0
 
 player = Character(screen_width//2, screen_height-50, 20)
+player_health = 0
 
 LEFT = False
 RIGHT = False
@@ -129,35 +130,38 @@ while running:
             if e.attr == 6:
                 enemyBullets = e.pattern5(enemyBullets)
     if frameCnt == 1300:
-        enemys.append(Enemy(screen_width//2, 0, 0, 1, 75, 7000, attr=7))
+        enemys.append(Enemy(screen_width//2, 0, 0, 1, 75, 2000, attr=7))
     if 1500 <= frameCnt <= 2300 and frameCnt % 40 == 0:
         for e in enemys:
             if e.attr == 7:
                 enemyBullets = e.boss_pattern_1(enemyBullets)
     if frameCnt == 2250:
-        enemys.append(Enemy(screen_width//2, 100, 0, 1, 35, 500, attr=9))
-        enemys.append(Enemy(screen_width//2, 100, 0, 1, 35, 500, attr=10))
-    if 2420 <= frameCnt <= 2650 and frameCnt % 40 == 0:
+        enemys.append(Enemy(e.x, e.y, 0, 1, 35, 500, attr=9))
+        enemys.append(Enemy(e.x , e.y, 0, 1, 35, 500, attr=10))
+    if 2420 <= frameCnt <= 2850 and frameCnt % 40 == 0:
         rotate_angle += 6
         for e in enemys:
             if e.attr == 9 or e.attr == 10:
                 for angles in range(rotate_angle, rotate_angle+360, 30):
                     angle = math.radians(angles)
                     enemyBullets.append(Bullet(e.x, e.y, math.cos(angle) * 2, math.sin(angle) * 5, 5))
-    if frameCnt > 2650 and frameCnt % 40 ==0:
+    if frameCnt > 2850 and frameCnt % 40 ==0:
         for e in enemys:
             if e.attr == 9 or e.attr == 10:
                 rotate_angle += 3
                 for angles in range(rotate_angle, rotate_angle+360, 20):
                     angle = math.radians(angles)
                     enemyBullets.append(Bullet(e.x, e.y, math.cos(angle) * 2, math.sin(angle) * 5, 5))
-    if 3250 <= frameCnt <= 4300 and frameCnt % 10 == 0:
+    if 3250 <= frameCnt <= 4300 and frameCnt % 15 == 0:
         rotate_angle +=9
         for e in enemys:
             if e.attr == 7:
                 for angles in range(rotate_angle, rotate_angle+360, 15):
                     angle = math.radians(angles)
                     enemyBullets.append(Bullet(e.x, e.y, math.cos(angle) * 3, math.sin(angle) * 3, 7))
+    if frameCnt == 4700:
+        pass
+
     # enemy update
     for e in enemys:
         e.update()
@@ -205,9 +209,9 @@ while running:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE] and frameCnt % 3 == 0:  
-        playerBullets.append(Bullet(player.x-15, player.y, 0, -15, 7))  
+        playerBullets.append(Bullet(player.x-15, player.y, -0.15, -15, 7))  
         playerBullets.append(Bullet(player.x, player.y, 0, -15, 7))
-        playerBullets.append(Bullet(player.x+15, player.y, 0, -15, 7))
+        playerBullets.append(Bullet(player.x+15, player.y, 0.15, -15, 7))
 
     for bullet in playerBullets:
         bullet.update(playerBullets, player)

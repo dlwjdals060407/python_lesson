@@ -17,6 +17,10 @@ class Enemy:
         
     def update(self):
         self.path.append((self.x, self.y))
+        self.x = min(self.x, 600)
+        self.y = min(self.y, 1000)
+        self.x = max(self.x, 0)
+        self.y = max(self.y, 0)
         if self.attr == 0:
             self.move_pattern1()
         if self.attr == 1: # 가속도
@@ -114,19 +118,42 @@ class Enemy:
             self.x += self.xspeed
             self.y += self.yspeed
 
-        # if  300 <= self.timetick <= 1000:
-        #     new_x = random.randint(50, 550)  
-        #     new_y = random.randint(50, 950)  
+        if self.timetick == 400:
+            self.xspeed = random.randint(-3,3)
+            self.yspeed = random.randint(-3,3)
 
-        #     delta_x = new_x - self.x
-        #     delta_y = new_y - self.y
-        #     distance = math.sqrt(delta_x**2 + delta_y**2)
+            self.x += self.xspeed
+            self.y += self.yspeed
+        
+        if self.timetick == 440:
+            self.xspeed = (self.xspeed)//2
+            self.yspeed = (self.yspeed)//2
 
-        #     self.xspeed = (delta_x / distance) * 3 
-        #     self.yspeed = (delta_y / distance) * 3 
-        #     self.x += self.xspeed
-        #     self.y += self.yspeed
+            self.x += self.xspeed
+            self.y += self.yspeed
+            
+        if self.timetick == 450:
+            self.xspeed = (self.xspeed)//2
+            self.yspeed = (self.yspeed)//2
+
+            self.x += self.xspeed
+            self.y += self.yspeed
+
+        if self.timetick == 455:
+            self.xspeed = 0
+            self.yspeed = 0
+
+            self.x += self.xspeed
+            self.y += self.yspeed
+
+        if self.timetick == 900:
+            self.x = 300
+            self.y = 100
     
+        if self.timetick == 3400:
+            self.x = 300
+            self.y = 300
+
     def stop(self):
         self.x = 0
         self.y = 0
