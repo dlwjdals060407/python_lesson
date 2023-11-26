@@ -1,4 +1,5 @@
 import math
+import random
 from Character import Character
 
 class Bullet:
@@ -32,9 +33,9 @@ class Bullet:
         if self.attr == 6:
             self.boss_move_pattern1(player)
         if self.attr == 7:
-             self.boss_move_pattern2()
+             self.boss_move_pattern2(bulletList)
         if self.attr == 8:
-             self.boss_move_pattern2()
+             self.boss_move_pattern3()
         return bulletList
     
     def is_colliding_with_player(self, player):
@@ -137,5 +138,14 @@ class Bullet:
                     newList.append(bullet)
             bulletList.remove(self) 
         return newList
+
     def boss_move_pattern3(self):
-        pass
+        self.timeTick += 1
+        self.rad += 0.1
+        angle = math.radians(self.timeTick)
+
+        self.xspeed = self.x + self.rad * math.cos(angle)
+        self.yspeed = self.y + self.rad * math.sin(angle)
+
+        self.x += self.xspeed
+        self.y += self.yspeed

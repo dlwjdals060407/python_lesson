@@ -15,7 +15,7 @@ class Enemy:
         self.timetick = 0
         self.path = []
         
-    def update(self):
+    def update(self,bl):
         self.path.append((self.x, self.y))
         self.x = min(self.x, 600)
         self.y = min(self.y, 1000)
@@ -41,6 +41,14 @@ class Enemy:
             self.boss_pattern_2()
         if self.attr == 10:
             self.boss_pattern_3()
+        if self.attr == 11:
+            self.move_around_boss()
+        if self.attr == 12:
+            self.move_around_boss_2()
+        if self.attr == 13:
+            bl = self.boss_pattern_4(bl)
+        return bl
+
 
     def is_colliding_with_player(self, player):
         distance = math.sqrt((self.x - player.x)**2 + (self.x - player.y)**2)
@@ -119,8 +127,8 @@ class Enemy:
             self.y += self.yspeed
 
         if self.timetick == 400:
-            self.xspeed = random.randint(-3,3)
-            self.yspeed = random.randint(-3,3)
+            self.xspeed = random.randint(-1,1)
+            self.yspeed = random.randint(-1,1)
 
             self.x += self.xspeed
             self.y += self.yspeed
@@ -150,9 +158,13 @@ class Enemy:
             self.x = 300
             self.y = 100
     
-        if self.timetick == 3400:
+        if self.timetick == 2400:
             self.x = 300
             self.y = 300
+        
+        if self.timetick == 3400:
+            self.x = 300
+            self.y = 100
 
     def stop(self):
         self.x = 0
@@ -219,3 +231,42 @@ class Enemy:
             self.yspeed = 2
             self.x += self.xspeed
             self.y += self.yspeed
+
+    def move_around_boss(self):
+        boss_x = 300  
+        boss_y = 300  
+        radius = 120  
+
+        angle = math.radians(self.timetick)
+        self.x = boss_x + int(radius * math.cos(angle))
+        self.y = boss_y + int(radius * math.sin(angle))
+        
+        self.timetick += 2
+
+    def move_around_boss_2(self):
+        boss_x = 300  
+        boss_y = 300  
+        radius = 120  
+
+        angle = math.radians(self.timetick)
+        self.x = boss_x + int(radius * math.cos(angle))
+        self.y = boss_y + int(radius * math.sin(angle))
+        
+        self.timetick -= 2
+    
+    # def boss_pattern_3(self, bulletList):
+    #     new = bulletList
+    #     if self.timetick % 20 == 0: 
+    #         for angle in range(0, 360, 10):
+    #             seta = math.radians(angle)
+    #             new.append(Bullet(300, 300, math.cos(seta) * 2, math.sin(seta) * 2, 7, attr=7))
+    #     return bulletList
+
+    def boss_pattern_4(self, bulletList):
+        self.timetick += 1
+        new = bulletList
+        if self.timetick % 20 == 0: 
+            for angle in range(0, 360, 10):
+                seta = math.radians(angle)
+                new.append(Bullet(300, 300, math.cos(seta) * 2, math.sin(seta) * 2, 7, attr=8))
+        return bulletList 
