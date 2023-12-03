@@ -162,7 +162,7 @@ class Enemy:
             self.x = 300
             self.y = 300
         
-        if self.timetick == 3400:
+        if self.timetick == 3350:
             self.x = 300
             self.y = 100
 
