@@ -175,12 +175,12 @@ class Enemy:
 
     def pattern1(self, bulletList):
         new = bulletList
-        new.append(Bullet(self.x, self.y, 0, 5, 20, attr=1))
+        new.append(Bullet(self.x, self.y, 0, 5, 10, attr=1))
         return bulletList
     
     def pattern2(self, bulletList):
         new = bulletList
-        new.append(Bullet(self.x, self.y, 0, 5, 20, attr=2))
+        new.append(Bullet(self.x, self.y, 0, 5, 10, attr=2))
         return bulletList
     
     def pattern3(self, bulletList):

@@ -55,7 +55,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    print(frameCnt)
+    # print(frameCnt)
     
     if frameCnt == 10:
         enemys.append(Enemy(random.randint(0, screen_width), 0, 0, 3, 20, 45, attr=0))
@@ -74,7 +74,7 @@ while running:
         enemys.append(Enemy(0, 50, 8, 2, 20, 45, attr=1))
     if frameCnt == 100:
         for e in enemys:
-            enemyBullets.append(Bullet(e.x, e.y, (player.x-e.x)/100, (player.y-e.y)/100, 4))
+            enemyBullets.append(Bullet(e.x, e.y, (player.x-e.x)/100, (player.y-e.y)/100, 2))
     if frameCnt == 300:
         enemys.append(Enemy(screen_width//2 - 50, 0, 0, 2, 20, 45, attr=0))
     if frameCnt == 320:
@@ -152,7 +152,7 @@ while running:
         for e in enemys:
             if e.attr == 7:
                 enemyBullets = e.boss_pattern_1(enemyBullets)
-    if frameCnt == 2250: #2250
+    if frameCnt == 2300: #2200
         enemys.append(Enemy(e.x, e.y, 0, 1, 35, 500, attr=9))
         enemys.append(Enemy(e.x , e.y, 0, 1, 35, 500, attr=10))
     if 2420 <= frameCnt <= 2850 and frameCnt % 40 == 0: #2420 - 2850
@@ -212,11 +212,12 @@ while running:
         if e.is_colliding_with_player(player):
             player_health -= 1
             if player_health <= 0:
-                pass
+                running = False  
     
     # draw enemy
     for e in enemys:
         pygame.draw.circle(screen, (255,204,51), (e.x, e.y), e.rad)
+        pygame.draw.rect(screen, (255, 0, 0), (e.x - e.rad, e.y - e.rad - 10, e.health, 5))
     
     # delete enemy
     for e in enemys:
@@ -226,6 +227,7 @@ while running:
         if e.y < 0 or e.y > screen_height:
             enemys.remove(e)
             continue
+        
     
     # enemy bullet update
     for b in enemyBullets:
@@ -233,6 +235,7 @@ while running:
             player_health -= 1
             if player_health <= 0:
                 print("game over")
+                running = False
         enemyBullets = b.update(enemyBullets, player)
     
     # draw enemy bullet
@@ -253,6 +256,9 @@ while running:
         if b.is_colliding_with_player(player):
             if b in enemyBullets:
                 enemyBullets.remove(b)
+                player_health -= 1
+                if player_health <= 0 :
+                    running = False 
 
     bullets_to_remove = []
 
