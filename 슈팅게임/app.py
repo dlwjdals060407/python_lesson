@@ -5,6 +5,7 @@ from Enemy import Enemy
 from Bullet import Bullet
 import random
 import math
+import time
 
 # Pygame 초기화
 pygame.init()
@@ -30,10 +31,14 @@ bullet_image = pygame.transform.scale(bullet_image, (40, 40))
 
 rotate_angle = 0
 
+Time = time.time()
+
 frameCnt = 0
+font = pygame.font.Font(None, 36)
+font2 = pygame.font.Font(None, 30)
 
 player = Character(screen_width//2, screen_height-50, 20)
-player_health = 5
+player_health = 30
 
 LEFT = False
 RIGHT = False
@@ -44,6 +49,7 @@ enemys = []
 enemyBullets = []
 playerBullets = []
 
+Collision = True
 running = True
 while running:
     frameCnt += 1
@@ -59,6 +65,7 @@ while running:
     
     if frameCnt == 10:
         enemys.append(Enemy(random.randint(0, screen_width), 0, 0, 3, 20, 45, attr=0))
+    if frameCnt == 20:
         enemys.append(Enemy(random.randint(0, screen_width), 0, 0, 3, 20, 45, attr=0))
     if frameCnt == 40:
         enemys.append(Enemy(random.randint(0, screen_width), 0, 0, 5, 20, 45, attr=0))
@@ -136,8 +143,8 @@ while running:
                     angle = math.radians(angles)
                     enemyBullets.append(Bullet(e.x, e.y, math.cos(angle) * 3, math.sin(angle) * 3, 4))
     if frameCnt == 800:
-        enemys.append(Enemy(100, 0, 0, 2, 20, 45, attr=6))
-        enemys.append(Enemy(500, 0, 0, 2, 20, 45, attr=6))
+        enemys.append(Enemy(100, 0, 0, 2, 20, 35, attr=6))
+        enemys.append(Enemy(500, 0, 0, 2, 20, 35, attr=6))
     if frameCnt >= 820 and frameCnt % 82 == 0:
         for e in enemys:
             if e.attr == 6:
@@ -217,8 +224,10 @@ while running:
     # draw enemy
     for e in enemys:
         pygame.draw.circle(screen, (255,204,51), (e.x, e.y), e.rad)
-        pygame.draw.rect(screen, (255, 0, 0), (e.x - e.rad, e.y - e.rad - 10, e.health, 5))
-    
+        # pygame.draw.rect(screen, (255, 0, 0), (e.x - e.rad, e.y - e.rad - 10, e.health, 5))
+        health_text = font2.render(f'{e.health}', True, (255, 0, 0))
+        screen.blit(health_text, ((e.x - e.rad)+5, e.y - e.rad - 20))
+        
     # delete enemy
     for e in enemys:
         if e.x < 0 or e.x > screen_width:
@@ -241,7 +250,7 @@ while running:
     # draw enemy bullet
     for b in enemyBullets:
         # screen.blit(bullet_image, (b.x - b.rad, b.y - b.rad))
-        pygame.draw.circle(screen, (255, 255, 255), (b.x, b.y), b.rad)
+        pygame.draw.circle(screen, (255, 51, 0), (b.x, b.y), b.rad)
     
     # delete enemy bullet
     for b in enemyBullets:
@@ -251,7 +260,7 @@ while running:
         if b.y < 0 or b.y > screen_height:
             enemyBullets.remove(b)
             continue
-    
+
     for b in enemyBullets:
         if b.is_colliding_with_player(player):
             if b in enemyBullets:
@@ -273,7 +282,7 @@ while running:
 
     # draw player bullets
     for bullet in playerBullets:
-        pygame.draw.circle(screen, (255, 0, 255), (bullet.x, bullet.y), bullet.rad)
+        pygame.draw.circle(screen, (102, 255, 255), (bullet.x, bullet.y), bullet.rad)
 
     for b in playerBullets:
         for e in enemys:
@@ -288,12 +297,15 @@ while running:
 
     # player move
     keys = pygame.key.get_pressed()
-    player.move(keys)
+    player.move(keys, screen_width, screen_height)
     
     # draw player
     transparent_surface = pygame.Surface((player.rad * 2, player.rad * 2), pygame.SRCALPHA)
     pygame.draw.circle(transparent_surface, (0, 0, 0, 255), (player.rad, player.rad), player.rad)
     screen.blit(player_image, (player.x-20, player.y-20))
+
+    health_text = font.render(f'Health: {player_health}', True, (255, 0, 0))
+    screen.blit(health_text, (10, screen_height - 60))
     
     pygame.display.flip()
     pygame.time.Clock().tick(60)  # 초당 60프레임으로 제한
